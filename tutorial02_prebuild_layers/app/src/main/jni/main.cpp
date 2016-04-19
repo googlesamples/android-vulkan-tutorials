@@ -77,15 +77,14 @@ bool initialize(android_app* app) {
     return false;
   }
 
-  VkApplicationInfo appInfo = {
-      .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-      .pNext = nullptr,
-      .apiVersion = VK_MAKE_VERSION(1, 0, 0),
-      .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-      .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-      .pApplicationName = "tutorial02_prebuilt_layers",
-      .pEngineName = "tutorial",
-  };
+  VkApplicationInfo appInfo;
+  memset(&appInfo, 0, sizeof(appInfo));
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.pApplicationName = "tutorial02_prebuilt_layers";
+  appInfo.pEngineName = "tutorial";
 
   // prepare debug and layer objects
   LayerAndExtensions layerAndExt;
@@ -93,16 +92,16 @@ bool initialize(android_app* app) {
 
   // Create Vulkan instance, requesting all enabled layers / extensions
   // available on the system
-  VkInstanceCreateInfo instanceCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-          .pNext = nullptr,
-          .pApplicationInfo = &appInfo,
-          .enabledExtensionCount = layerAndExt.InstExtCount(),
-          .ppEnabledExtensionNames =
-                 static_cast<const char* const*>(layerAndExt.InstExtNames()),
-          .enabledLayerCount = layerAndExt.InstLayerCount(),
-          .ppEnabledLayerNames = static_cast<const char* const*>(layerAndExt.InstLayerNames()),
-  };
+  VkInstanceCreateInfo instanceCreateInfo;
+  memset(&instanceCreateInfo, 0, sizeof(instanceCreateInfo));
+  instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  instanceCreateInfo.pApplicationInfo = &appInfo;
+  instanceCreateInfo.enabledExtensionCount = layerAndExt.InstExtCount();
+  instanceCreateInfo.ppEnabledExtensionNames =
+                 static_cast<const char* const*>(layerAndExt.InstExtNames());
+  instanceCreateInfo.enabledLayerCount = layerAndExt.InstLayerCount();
+  instanceCreateInfo.ppEnabledLayerNames =
+          static_cast<const char* const*>(layerAndExt.InstLayerNames());
   CALL_VK(vkCreateInstance(&instanceCreateInfo, nullptr, &tutorialInstance));
 
   // Create debug callback obj and connect to vulkan instance
@@ -131,11 +130,10 @@ bool initialize(android_app* app) {
            VK_VERSION_MINOR(gpuProperties.apiVersion),
            VK_VERSION_PATCH(gpuProperties.apiVersion));
 
-  VkAndroidSurfaceCreateInfoKHR createInfo {
-          .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
-          .pNext = nullptr,
-          .flags = 0,
-          .window = app->window };
+  VkAndroidSurfaceCreateInfoKHR createInfo;
+  memset(&createInfo, 0, sizeof(createInfo));
+  createInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+  createInfo.window = app->window;
   CALL_VK(vkCreateAndroidSurfaceKHR(tutorialInstance, &createInfo, nullptr,
                                     &tutorialSurface));
 
@@ -163,30 +161,27 @@ bool initialize(android_app* app) {
 
   // Create a logical device from GPU we picked
   float priorities[] = { 1.0f, };
-  VkDeviceQueueCreateInfo queueCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-          .pNext = nullptr,
-          .flags = 0,
-          .queueCount = 1,
-          .queueFamilyIndex = 0,
-          // Send nullptr for queue priority so debug extension could
-          // catch the bug and call back app's debug function
-          .pQueuePriorities = nullptr, //priorities,
-  };
+  VkDeviceQueueCreateInfo queueCreateInfo;
+  memset(&queueCreateInfo, 0, sizeof(queueCreateInfo));
+  queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCreateInfo.queueCount = 1;
+  queueCreateInfo.queueFamilyIndex = 0;
+  // Send nullptr for queue priority so debug extension could
+  // catch the bug and call back app's debug function
+  queueCreateInfo.pQueuePriorities = nullptr; //priorities,
 
-  VkDeviceCreateInfo deviceCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-          .pNext = nullptr,
-          .queueCreateInfoCount = 1,
-          .pQueueCreateInfos = &queueCreateInfo,
-          .enabledLayerCount = layerAndExt.DevLayerCount(),
-          .ppEnabledLayerNames =
-          static_cast<const char* const*>(layerAndExt.DevLayerNames()),
-          .enabledExtensionCount = layerAndExt.DevExtCount(),
-          .ppEnabledExtensionNames =
-          static_cast<const char* const*>(layerAndExt.DevExtNames()),
-          .pEnabledFeatures = nullptr,
-  };
+  VkDeviceCreateInfo deviceCreateInfo;
+  memset(&deviceCreateInfo, 0, sizeof(deviceCreateInfo));
+  deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceCreateInfo.queueCreateInfoCount = 1;
+  deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+  deviceCreateInfo.enabledLayerCount = layerAndExt.DevLayerCount();
+  deviceCreateInfo.ppEnabledLayerNames =
+          static_cast<const char* const*>(layerAndExt.DevLayerNames());
+  deviceCreateInfo.enabledExtensionCount = layerAndExt.DevExtCount();
+  deviceCreateInfo.ppEnabledExtensionNames =
+          static_cast<const char* const*>(layerAndExt.DevExtNames());
+  deviceCreateInfo.pEnabledFeatures = nullptr;
 
   CALL_VK(vkCreateDevice(tutorialGpu, &deviceCreateInfo, nullptr,
                          &tutorialDevice));

@@ -19,7 +19,7 @@ model {
         }
         ndk {
             moduleName = "vktuts"
-            toolchain = "clang"
+            // toolchain = "clang"
             stl = "gnustl_static"
             ldLibs.addAll(["log", "android"])
             cppFlags.addAll(["-Werror", "-std=c++11",
@@ -70,9 +70,9 @@ model {
 task(buildLayers, type : Exec) {
     workingDir(valLayerSrc + "/build-android")
     if(!file("${valLayerSrc}/build-android/libs").exists()) {
-        commandLine "${ndkDir}/ndk-build", "NDK_PROJECT_PATH=.", "-j", "8"
+        commandLine "cmd", "${ndkDir}/ndk-build", "NDK_PROJECT_PATH=.", "-j", "8"
     } else {
-        commandLine 'echo', 'Validation layer is already up to date'
+        commandLine "cmd", 'echo', 'Validation layer is already up to date'
     }
 }
 
@@ -84,8 +84,8 @@ task(copyValidationLayers, type: Copy) {
 
 tasks.whenTaskAdded { task ->
     if (task.name.contains('compile')) {
-        task.dependsOn buildLayers
-        task.dependsOn copyValidationLayers
+//        task.dependsOn buildLayers
+//        task.dependsOn copyValidationLayers
     }
 }
 

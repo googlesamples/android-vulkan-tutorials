@@ -14,10 +14,10 @@ model {
         }
         ndk {
             moduleName = "vktuts"
-            toolchain = "clang"
+            // toolchain = "clang"
             stl = "gnustl_static"
             ldLibs.addAll(["log", "android"])
-            cppFlags.addAll(["-Werror", "-std=c++11",
+            cppFlags.addAll(["-Wall", "-Werror", "-std=c++11",
                              "-D VK_USE_PLATFORM_ANDROID_KHR"])
             cppFlags.addAll("-I" + file("src/main/jni"))
             abiFilters.addAll(["armeabi-v7a", 'arm64-v8a', 'x86', 'x86_64'])
