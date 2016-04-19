@@ -16,9 +16,7 @@ model {
         }
         ndk {
             moduleName = "native-activity"
-            stl        = "gnustl_static"
-            cppFlags.add("-Werror")
-            cppFlags.add("-I" + "${ndkDir}/sources/android/native_app_glue")
+            CFlags.addAll(["-Werror", "-Wall"])
             ldLibs.addAll(["log", "android"])
             ldFlags.add("-c")
         }
