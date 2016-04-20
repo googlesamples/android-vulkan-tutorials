@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.model.application'
 
 Properties properties = new Properties()
@@ -67,12 +69,20 @@ model {
 // ******** Adding validation layers into build *******
 // Build layers if necessary
 //    to build on windows(*), add 'cmd' to commandline
+def ndkBuildCmd = "${ndkDir}/ndk-build"
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    ndkBuildCmd = "${ndkDir}/ndk-build.cmd"
+}
 task(buildLayers, type : Exec) {
     workingDir(valLayerSrc + "/build-android")
     if(!file("${valLayerSrc}/build-android/libs").exists()) {
-        commandLine "cmd", "${ndkDir}/ndk-build", "NDK_PROJECT_PATH=.", "-j", "8"
+        commandLine "${ndkBuildCmd}", 'NDK_PROJECT_PATH=.', '-j', '8'
     } else {
-        commandLine "cmd", 'echo', 'Validation layer is already up to date'
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            commandLine 'cmd', 'echo', 'Validation layer is already up to date'
+        } else {
+            commandLine 'echo', 'Validation layer is already up to date'
+        }
     }
 }
 
@@ -84,8 +94,8 @@ task(copyValidationLayers, type: Copy) {
 
 tasks.whenTaskAdded { task ->
     if (task.name.contains('compile')) {
-//        task.dependsOn buildLayers
-//        task.dependsOn copyValidationLayers
+        task.dependsOn buildLayers
+        task.dependsOn copyValidationLayers
     }
 }
 
