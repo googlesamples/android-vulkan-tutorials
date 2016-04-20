@@ -76,15 +76,14 @@ bool initialize(android_app* app) {
     return false;
   }
 
-  VkApplicationInfo appInfo = {
-      .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-      .pNext = nullptr,
-      .apiVersion = VK_MAKE_VERSION(1, 0, 0),
-      .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-      .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-      .pApplicationName = "tutorial01_load_vulkan",
-      .pEngineName = "tutorial",
-  };
+  VkApplicationInfo appInfo;
+  memset(&appInfo, 0, sizeof(appInfo));
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.pApplicationName = "tutorial01_load_vulkan";
+  appInfo.pEngineName = "tutorial";
 
   // prepare necessary extensions: Vulkan on Android need these to function
   std::vector<const char *> instanceExt, deviceExt;
@@ -93,23 +92,19 @@ bool initialize(android_app* app) {
   deviceExt.push_back("VK_KHR_swapchain");
 
   // Create the Vulkan instance
-  VkInstanceCreateInfo instanceCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-          .pNext = nullptr,
-          .pApplicationInfo = &appInfo,
-          .enabledExtensionCount = static_cast<uint32_t>(instanceExt.size()),
-          .ppEnabledExtensionNames = instanceExt.data(),
-          .enabledLayerCount = 0,
-          .ppEnabledLayerNames = nullptr,
-  };
+  VkInstanceCreateInfo instanceCreateInfo;
+  memset(&instanceCreateInfo, 0, sizeof(instanceCreateInfo));
+  instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  instanceCreateInfo.pApplicationInfo = &appInfo;
+  instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExt.size());
+  instanceCreateInfo.ppEnabledExtensionNames = instanceExt.data();
   CALL_VK(vkCreateInstance(&instanceCreateInfo, nullptr, &tutorialInstance));
 
   // if we create a surface, we need the surface extension
-  VkAndroidSurfaceCreateInfoKHR createInfo {
-          .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
-          .pNext = nullptr,
-          .flags = 0,
-          .window = app->window };
+  VkAndroidSurfaceCreateInfoKHR createInfo;
+  memset(&createInfo, 0, sizeof(createInfo));
+  createInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+  createInfo.window = app->window;
   CALL_VK(vkCreateAndroidSurfaceKHR(tutorialInstance, &createInfo, nullptr,
                                     &tutorialSurface));
 
@@ -157,26 +152,21 @@ bool initialize(android_app* app) {
 
   // Create a logical device from GPU we picked
   float priorities[] = { 1.0f, };
-  VkDeviceQueueCreateInfo queueCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-          .pNext = nullptr,
-          .flags = 0,
-          .queueCount = 1,
-          .queueFamilyIndex = 0,
-          .pQueuePriorities = priorities,
-  };
+  VkDeviceQueueCreateInfo queueCreateInfo;
+  memset(&queueCreateInfo, 0, sizeof(queueCreateInfo));
+  queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCreateInfo.queueCount = 1;
+  queueCreateInfo.queueFamilyIndex = 0;
+  queueCreateInfo.pQueuePriorities = priorities;
 
-  VkDeviceCreateInfo deviceCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-          .pNext = nullptr,
-          .queueCreateInfoCount = 1,
-          .pQueueCreateInfos = &queueCreateInfo,
-          .enabledLayerCount = 0,
-          .ppEnabledLayerNames = nullptr,
-          .enabledExtensionCount = static_cast<uint32_t>(deviceExt.size()),
-          .ppEnabledExtensionNames = deviceExt.data(),
-          .pEnabledFeatures = nullptr,
-  };
+  VkDeviceCreateInfo deviceCreateInfo;
+  memset(&deviceCreateInfo, 0, sizeof(deviceCreateInfo));
+  deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceCreateInfo.queueCreateInfoCount = 1;
+  deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+  deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExt.size());
+  deviceCreateInfo.ppEnabledExtensionNames = deviceExt.data();
+  deviceCreateInfo.pEnabledFeatures = nullptr;
 
   CALL_VK(vkCreateDevice(tutorialGpu, &deviceCreateInfo, nullptr,
                          &tutorialDevice));

@@ -14,7 +14,7 @@ model {
         }
         ndk {
             moduleName = "vktuts"
-            toolchain = "clang"
+            // toolchain = "clang"
             stl = "gnustl_static"
             ldLibs.addAll(["log", "android"])
             cppFlags.addAll(["-Werror", "-std=c++11",

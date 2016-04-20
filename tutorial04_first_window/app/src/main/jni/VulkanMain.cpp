@@ -89,22 +89,18 @@ void CreateVulkanDevice(ANativeWindow* platformWindow,
 
   // **********************************************************
   // Create the Vulkan instance
-  VkInstanceCreateInfo instanceCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-          .pNext = nullptr,
-          .pApplicationInfo = appInfo,
-          .enabledExtensionCount = static_cast<uint32_t>(instance_extensions.size()),
-          .ppEnabledExtensionNames = instance_extensions.data(),
-          .enabledLayerCount = 0,
-          .ppEnabledLayerNames = nullptr,
-  };
+  VkInstanceCreateInfo instanceCreateInfo;
+  memset(&instanceCreateInfo, 0, sizeof(instanceCreateInfo));
+  instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  instanceCreateInfo.pApplicationInfo = appInfo;
+  instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(instance_extensions.size());
+  instanceCreateInfo.ppEnabledExtensionNames = instance_extensions.data();
   CALL_VK(vkCreateInstance(&instanceCreateInfo, nullptr, &device.instance_));
-  VkAndroidSurfaceCreateInfoKHR createInfo{
-          .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
-          .pNext = nullptr,
-          .flags = 0,
-          .window = platformWindow};
 
+  VkAndroidSurfaceCreateInfoKHR createInfo;
+  memset(&createInfo, 0, sizeof(createInfo));
+  createInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+  createInfo.window = platformWindow;
   CALL_VK(vkCreateAndroidSurfaceKHR(device.instance_, &createInfo, nullptr,
                                     &device.surface_));
   // Find one GPU to use:
@@ -118,26 +114,22 @@ void CreateVulkanDevice(ANativeWindow* platformWindow,
 
   // Create a logical device (vulkan device)
   float priorities[] = { 1.0f, };
-  VkDeviceQueueCreateInfo queueCreateInfo{
-          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-          .pNext = nullptr,
-          .flags = 0,
-          .queueCount = 1,
-          .queueFamilyIndex = 0,
-          .pQueuePriorities = priorities,
-  };
+  VkDeviceQueueCreateInfo queueCreateInfo;
+  memset(&queueCreateInfo, 0, sizeof(queueCreateInfo));
+  queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queueCreateInfo.queueCount = 1;
+  queueCreateInfo.queueFamilyIndex = 0;
+  queueCreateInfo.pQueuePriorities = priorities;
 
-  VkDeviceCreateInfo deviceCreateInfo{
-          .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-          .pNext = nullptr,
-          .queueCreateInfoCount = 1,
-          .pQueueCreateInfos = &queueCreateInfo,
-          .enabledLayerCount = 0,
-          .ppEnabledLayerNames = nullptr,
-          .enabledExtensionCount = static_cast<uint32_t>(device_extensions.size()),
-          .ppEnabledExtensionNames = device_extensions.data(),
-          .pEnabledFeatures = nullptr,
-  };
+  VkDeviceCreateInfo deviceCreateInfo;
+  memset(&deviceCreateInfo, 0, sizeof(deviceCreateInfo));
+  deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceCreateInfo.queueCreateInfoCount = 1;
+  deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+  deviceCreateInfo.enabledExtensionCount =
+      static_cast<uint32_t>(device_extensions.size());
+  deviceCreateInfo.ppEnabledExtensionNames = device_extensions.data();
+  deviceCreateInfo.pEnabledFeatures = nullptr;
 
   CALL_VK(vkCreateDevice(device.gpuDevice_, &deviceCreateInfo, nullptr,
                          &device.device_));
@@ -179,24 +171,23 @@ void CreateSwapChain() {
   // Create a swap chain (here we choose the minimum available number of surface
   // in the chain)
   uint32_t queueFamily = 0;
-  VkSwapchainCreateInfoKHR swapchainCreateInfo {
-          .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-          .pNext = nullptr,
-          .surface = device.surface_,
-          .minImageCount = surfaceCapabilities.minImageCount,
-          .imageFormat = formats[chosenFormat].format,
-          .imageColorSpace = formats[chosenFormat].colorSpace,
-          .imageExtent = surfaceCapabilities.currentExtent,
-          .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-          .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
-          .imageArrayLayers = 1,
-          .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-          .queueFamilyIndexCount = 1,
-          .pQueueFamilyIndices = &queueFamily,
-          .presentMode = VK_PRESENT_MODE_FIFO_KHR,
-          .oldSwapchain = VK_NULL_HANDLE,
-          .clipped = VK_FALSE,
-  };
+  VkSwapchainCreateInfoKHR swapchainCreateInfo;
+  memset(&swapchainCreateInfo, 0, sizeof(swapchainCreateInfo));
+  swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  swapchainCreateInfo.surface = device.surface_;
+  swapchainCreateInfo.minImageCount = surfaceCapabilities.minImageCount;
+  swapchainCreateInfo.imageFormat = formats[chosenFormat].format;
+  swapchainCreateInfo.imageColorSpace = formats[chosenFormat].colorSpace;
+  swapchainCreateInfo.imageExtent = surfaceCapabilities.currentExtent;
+  swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+  swapchainCreateInfo.imageArrayLayers = 1;
+  swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  swapchainCreateInfo.queueFamilyIndexCount = 1;
+  swapchainCreateInfo.pQueueFamilyIndices = &queueFamily;
+  swapchainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+  swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+  swapchainCreateInfo.clipped = VK_FALSE;
   CALL_VK(vkCreateSwapchainKHR(device.device_, &swapchainCreateInfo,
                                nullptr, &swapchain.swapchain_));
 
@@ -221,27 +212,22 @@ void CreateFrameBuffers(VkRenderPass& renderPass,
   // create image view for each swapchain image
   swapchain.displayViews_ = new VkImageView[SwapchainImagesCount];
   for (uint32_t i = 0; i < SwapchainImagesCount; i++) {
-    VkImageViewCreateInfo viewCreateInfo = {
-        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-        .pNext = nullptr,
-        .image = displayImages[i],
-        .viewType = VK_IMAGE_VIEW_TYPE_2D,
-        .format = swapchain.displayFormat_,
-        .components = {
-           .r = VK_COMPONENT_SWIZZLE_R,
-           .g = VK_COMPONENT_SWIZZLE_G,
-           .b = VK_COMPONENT_SWIZZLE_B,
-           .a = VK_COMPONENT_SWIZZLE_A,
-        },
-        .subresourceRange = {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel = 0,
-            .levelCount = 1,
-            .baseArrayLayer = 0,
-            .layerCount = 1,
-        },
-        .flags = 0,
-    };
+    VkImageViewCreateInfo viewCreateInfo;
+    memset(&viewCreateInfo, 0, sizeof(viewCreateInfo));
+    viewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewCreateInfo.image = displayImages[i];
+    viewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewCreateInfo.format = swapchain.displayFormat_;
+    viewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+    viewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+    viewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+    viewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+    viewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewCreateInfo.subresourceRange.baseMipLevel = 0;
+    viewCreateInfo.subresourceRange.levelCount = 1;
+    viewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    viewCreateInfo.subresourceRange.layerCount = 1;
+    viewCreateInfo.flags = 0;
     CALL_VK(vkCreateImageView(device.device_, &viewCreateInfo, nullptr,
                               &swapchain.displayViews_[i]));
   }
@@ -253,16 +239,14 @@ void CreateFrameBuffers(VkRenderPass& renderPass,
     VkImageView attachments[2] = {
             swapchain.displayViews_[i], depthView,
     };
-    VkFramebufferCreateInfo fbCreateInfo {
-            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .pNext = nullptr,
-            .renderPass = renderPass,
-            .layers = 1,
-            .attachmentCount = 1,  // 2 if using depth
-            .pAttachments = attachments,
-            .width = static_cast<uint32_t>(swapchain.displaySize_.width),
-            .height = static_cast<uint32_t>(swapchain.displaySize_.height),
-    };
+    VkFramebufferCreateInfo fbCreateInfo;
+    fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    fbCreateInfo.renderPass = renderPass;
+    fbCreateInfo.layers = 1;
+    fbCreateInfo.attachmentCount = 1;  // 2 if using depth
+    fbCreateInfo.pAttachments = attachments;
+    fbCreateInfo.width = static_cast<uint32_t>(swapchain.displaySize_.width);
+    fbCreateInfo.height = static_cast<uint32_t>(swapchain.displaySize_.height);
     fbCreateInfo.attachmentCount = (depthView == VK_NULL_HANDLE ? 1 : 2);
 
     CALL_VK(vkCreateFramebuffer(device.device_, &fbCreateInfo, nullptr,
@@ -280,16 +264,14 @@ bool InitVulkan(android_app* app) {
     LOGW("Vulkan is unavailable, install vulkan and re-start");
     return false;
   }
-
-  VkApplicationInfo appInfo = {
-      .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-      .pNext = nullptr,
-      .apiVersion = VK_MAKE_VERSION(1, 0, 0),
-      .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-      .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-      .pApplicationName = "tutorial04_first_window",
-      .pEngineName = "tutorial",
-  };
+  VkApplicationInfo appInfo;
+  memset(&appInfo, 0, sizeof(appInfo));
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.pApplicationName = "tutorial04_first_window";
+  appInfo.pEngineName = "tutorial";
 
   // create a device
   CreateVulkanDevice(app->window, &appInfo);
@@ -298,42 +280,34 @@ bool InitVulkan(android_app* app) {
 
   // -----------------------------------------------------------------
   // Create render pass
-  VkAttachmentDescription attachmentDescriptions{
-      .format = swapchain.displayFormat_,
-      .samples = VK_SAMPLE_COUNT_1_BIT,
-      .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-      .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-      .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-      .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-      .initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      .finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-  };
+  VkAttachmentDescription attachmentDescriptions;
+  memset(&attachmentDescriptions, 0, sizeof(attachmentDescriptions));
+  attachmentDescriptions.format = swapchain.displayFormat_;
+  attachmentDescriptions.samples = VK_SAMPLE_COUNT_1_BIT;
+  attachmentDescriptions.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  attachmentDescriptions.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+  attachmentDescriptions.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  attachmentDescriptions.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  attachmentDescriptions.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  attachmentDescriptions.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
   VkAttachmentReference colourReference = {
       .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
 
-  VkSubpassDescription subpassDescription {
-      .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-      .flags = 0,
-      .inputAttachmentCount = 0,
-      .pInputAttachments = nullptr,
-      .colorAttachmentCount = 1,
-      .pColorAttachments = &colourReference,
-      .pResolveAttachments = nullptr,
-      .pDepthStencilAttachment = nullptr,
-      .preserveAttachmentCount = 0,
-      .pPreserveAttachments = nullptr,
-  };
-  VkRenderPassCreateInfo renderPassCreateInfo {
-      .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-      .pNext = nullptr,
-      .attachmentCount = 1,
-      .pAttachments = &attachmentDescriptions,
-      .subpassCount = 1,
-      .pSubpasses = &subpassDescription,
-      .dependencyCount = 0,
-      .pDependencies = nullptr,
-  };
+  VkSubpassDescription subpassDescription;
+  memset(&subpassDescription, 0, sizeof(subpassDescription));
+  subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+  subpassDescription.flags = 0;
+  subpassDescription.colorAttachmentCount = 1;
+  subpassDescription.pColorAttachments = &colourReference;
+
+  VkRenderPassCreateInfo renderPassCreateInfo;
+  memset(&renderPassCreateInfo, 0, sizeof(renderPassCreateInfo));
+  renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  renderPassCreateInfo.attachmentCount = 1;
+  renderPassCreateInfo.pAttachments = &attachmentDescriptions;
+  renderPassCreateInfo.subpassCount = 1;
+  renderPassCreateInfo.pSubpasses = &subpassDescription;
   CALL_VK(vkCreateRenderPass(device.device_, &renderPassCreateInfo,
                              nullptr, &render.renderPass_));
 
@@ -344,10 +318,10 @@ bool InitVulkan(android_app* app) {
   // -----------------------------------------------
   // Create a pool of command buffers to allocate command buffer from
   VkCommandPoolCreateInfo cmdPoolCreateInfo {
-      .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-      .queueFamilyIndex = 0,
+      VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+      nullptr,
+      VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+      0
   };
   CALL_VK(vkCreateCommandPool(device.device_, &cmdPoolCreateInfo,
                               nullptr, &render.cmdPool_));
@@ -361,44 +335,37 @@ bool InitVulkan(android_app* app) {
        bufferIndex++) {
     // We start by creating and declare the "beginning" our command buffer
     VkCommandBufferAllocateInfo cmdBufferCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .pNext = nullptr,
-        .commandPool = render.cmdPool_,
-        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-        .commandBufferCount = 1,
+        VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        nullptr,
+        render.cmdPool_,
+        VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        render.cmdBufferLen_,
     };
     CALL_VK(vkAllocateCommandBuffers(device.device_, &cmdBufferCreateInfo,
                                    &render.cmdBuffer_[bufferIndex]));
 
-    VkCommandBufferBeginInfo cmdBufferBeginInfo {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .pInheritanceInfo = nullptr,
-    };
+    VkCommandBufferBeginInfo cmdBufferBeginInfo;
+    memset(&cmdBufferBeginInfo, 0, sizeof(cmdBufferBeginInfo));
+    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     CALL_VK(vkBeginCommandBuffer(render.cmdBuffer_[bufferIndex],
                                  &cmdBufferBeginInfo));
 
     // Now we start a renderpass. Any draw command has to be recorded in a
     // renderpass
-    VkClearValue clearVals {
-        .color.float32[0] = 0.0f,
-        .color.float32[1] = 0.34f,
-        .color.float32[2] = 0.90f,
-        .color.float32[3] = 1.0f,
-    };
-    VkRenderPassBeginInfo renderPassBeginInfo {
-        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-        .pNext = nullptr,
-        .renderPass = render.renderPass_,
-        .framebuffer = swapchain.framebuffers_[bufferIndex],
-        .renderArea = {
-             .offset = { .x = 0, .y = 0,},
-             .extent = swapchain.displaySize_
-        },
-        .clearValueCount = 1,
-        .pClearValues = &clearVals
-    };
+    VkClearValue clearVals;
+    memset(&clearVals, 0, sizeof(clearVals));
+    clearVals.color = {0.0f, 0.34f, 0.90f, 1.0f };
+
+    VkRenderPassBeginInfo renderPassBeginInfo;
+    memset(&renderPassBeginInfo, 0, sizeof(renderPassBeginInfo));
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = render.renderPass_;
+    renderPassBeginInfo.framebuffer = swapchain.framebuffers_[bufferIndex];
+    // renderPassBeginInfo.renderArea.offset = {0, 0};
+    renderPassBeginInfo.renderArea.extent = swapchain.displaySize_;
+    renderPassBeginInfo.clearValueCount = 1;
+    renderPassBeginInfo.pClearValues = &clearVals;
+
     vkCmdBeginRenderPass(render.cmdBuffer_[bufferIndex], &renderPassBeginInfo,
                          VK_SUBPASS_CONTENTS_INLINE);
     // Do more drawing !
@@ -409,20 +376,17 @@ bool InitVulkan(android_app* app) {
 
   // We need to create a fence to be able, in the main loop, to wait for our
   // draw command(s) to finish before swapping the framebuffers
-  VkFenceCreateInfo fenceCreateInfo {
-      .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = 0,
-  };
+  VkFenceCreateInfo fenceCreateInfo { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+                                      nullptr, 0, };
   CALL_VK(vkCreateFence(device.device_, &fenceCreateInfo,
                         nullptr, &render.fence_));
 
   // We need to create a semaphore to be able to wait, in the main loop, for our
   // framebuffer to be available for us before drawing.
-  VkSemaphoreCreateInfo semaphoreCreateInfo{
-      .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = 0,
+  VkSemaphoreCreateInfo semaphoreCreateInfo {
+      VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+      nullptr,
+      0,
   };
   CALL_VK(vkCreateSemaphore(device.device_, &semaphoreCreateInfo,
                             nullptr, &render.semaphore_));
@@ -468,18 +432,19 @@ bool VulkanDrawFrame(void) {
   uint32_t nextIndex;
   // Get the framebuffer index we should draw in
   CALL_VK(vkAcquireNextImageKHR(device.device_, swapchain.swapchain_,
-                              UINT64_MAX, render.semaphore_,
-                              VK_NULL_HANDLE, &nextIndex));
+                                UINT64_MAX, render.semaphore_,
+                                VK_NULL_HANDLE, &nextIndex));
   CALL_VK(vkResetFences(device.device_, 1, &render.fence_));
-  VkSubmitInfo submit_info = {
-        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .pNext = nullptr,
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores = &render.semaphore_,
-        .commandBufferCount = 1,
-        .pCommandBuffers = &render.cmdBuffer_[nextIndex],
-        .signalSemaphoreCount = 0,
-        .pSignalSemaphores = nullptr
+  VkSubmitInfo submit_info {
+      VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      nullptr,
+      1,                   // waitSemaphoreCount
+      &render.semaphore_,  // pWaitSemaphores
+      nullptr,             // pWaitDstStageMask
+      1,                   // commandBufferCount
+      .pCommandBuffers = &render.cmdBuffer_[nextIndex],
+      0,                   // signalSemaphoreCount
+      nullptr              // pSignalSemaphores
   };
   CALL_VK(vkQueueSubmit(device.queue_, 1, &submit_info, render.fence_));
   CALL_VK(vkWaitForFences(device.device_, 1, &render.fence_, VK_TRUE, 100000000));
@@ -487,16 +452,14 @@ bool VulkanDrawFrame(void) {
   LOGI("Drawing frames......");
 
   VkResult result;
-  VkPresentInfoKHR presentInfo {
-        .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-        .pNext = nullptr,
-        .swapchainCount = 1,
-        .pSwapchains = &swapchain.swapchain_,
-        .pImageIndices = &nextIndex,
-        .waitSemaphoreCount = 0,
-        .pWaitSemaphores = nullptr,
-        .pResults = &result,
-  };
+  VkPresentInfoKHR presentInfo;
+  memset(&presentInfo, 0, sizeof(presentInfo));
+  presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+  presentInfo.swapchainCount = 1;
+  presentInfo.pSwapchains = &swapchain.swapchain_;
+  presentInfo.pImageIndices = &nextIndex;
+  presentInfo.pResults = &result;
+
   vkQueuePresentKHR(device.queue_, &presentInfo);
   return true;
 }
