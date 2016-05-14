@@ -38,18 +38,6 @@
  */
 extern int InitVulkan(void);
 
-// flag
-extern bool isInstanceLoaded = false;
-
-// Available extensions and layers
-extern char* ppAvailableExtensions[];
-extern char* ppAvailableLayers[]; 
-
-extern uint32_t availableExtensionsCount;
-extern uint32_t availableLayersCount; 
-
-//hook
-PFN_vkCreateInstance vkCreateInstance_HOOK;
 
 // VK_core
 extern PFN_vkCreateInstance vkCreateInstance;
