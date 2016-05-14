@@ -165,9 +165,9 @@ int InitInstanceProcs(VkInstance instance){
     vkGetDeviceProcAddr = (PFN_vkGetDeviceProcAddr)(vkGetInstanceProcAddr(instance, "vkGetDeviceProcAddr"));
     vkCreateDevice = (PFN_vkCreateDevice)(vkGetInstanceProcAddr(instance, "vkCreateDevice"));
     vkDestroyDevice = (PFN_vkDestroyDevice)(vkGetInstanceProcAddr(instance, "vkDestroyDevice"));
-    vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateInstanceExtensionProperties"));
+//  vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateInstanceExtensionProperties"));
     vkEnumerateDeviceExtensionProperties = (PFN_vkEnumerateDeviceExtensionProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateDeviceExtensionProperties"));
-    vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateInstanceLayerProperties"));
+//  vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateInstanceLayerProperties"));
     vkEnumerateDeviceLayerProperties = (PFN_vkEnumerateDeviceLayerProperties)(vkGetInstanceProcAddr(instance, "vkEnumerateDeviceLayerProperties"));
     vkGetDeviceQueue = (PFN_vkGetDeviceQueue)(vkGetInstanceProcAddr(instance, "vkGetDeviceQueue"));
     vkQueueSubmit = (PFN_vkQueueSubmit)(vkGetInstanceProcAddr(instance, "vkQueueSubmit"));
