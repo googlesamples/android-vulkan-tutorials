@@ -84,12 +84,36 @@ int InitVulkan(void) {
  */
 VkResult vkCreateInstanceDelegate( const VkInstanceCreateInfo* pCreateInfo,
                                    const VkAllocationCallbacks* pAllocator,
+<<<<<<< HEAD
 			           VkInstance* pInstance){
     VkResult res = vkCreateInstance_HOOK(pCreateInfo, pAllocator, pInstance);    
+=======
+			           VkInstance* pInstance){	
+  VkResult res;  
+// EXPERIMENTAL - NOT FOR PRODUCTION !!  
+#ifdef VULKAN_WRAPPER_ENABLE_ALL_EXTENSIONS_DEFAULT
+    // enable all extensions if there is not extensions enabled
+    if(pCreateInfo != NULL && (pCreateInfo->ppEnabledExtensionNames == NULL || pCreateInfo->enabledExtensionCount==0) ){
+        VkInstanceCreateInfo createInfo = *pCreateInfo;
+        createInfo.enabledExtensionCount = _extensionCount;
+        createInfo.ppEnabledExtensionNames = _ppExtensionNames;
+        printf("VULKAN_WRAPPER_ENABLE_ALL_EXTENSIONS_DEFAULT 0x%p count: %d \n", _ppExtensionNames, _extensionCount );
+        res = vkCreateInstance_HOOK(&createInfo, pAllocator, pInstance);	
+    }else
+#endif	
+    {
+    // call Hook
+    res = vkCreateInstance_HOOK(pCreateInfo, pAllocator, pInstance);	
+    }
+>>>>>>> origin/master
     if(res < 0){
 	return res;
     }	
+<<<<<<< HEAD
     //Load VkInstance's related functions
+=======
+    // Load ALL VkInstance related functions
+>>>>>>> origin/master
     VkInstance instance = *pInstance;
     LoadInstanceProcs(instance);    
     return res;
