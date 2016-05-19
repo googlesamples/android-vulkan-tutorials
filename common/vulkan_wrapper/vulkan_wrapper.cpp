@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This file is handmade.
 
 #include <string.h>
 #include <vector>
@@ -28,7 +29,6 @@
    #include <dlfcn.h>
 #endif
 
-static bool isInstanceLoaded = false;
 // a hook to Vulkan native function
 static PFN_vkCreateInstance vkCreateInstance_HOOK;
 
@@ -69,17 +69,18 @@ int InitVulkan(void) {
     if(!vkGetInstanceProcAddr)
 	   return 0;
 
-    //load basic functions required by  createInstance
+    //load the two basic functions required by VkCreateInstance
     vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties) (vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceExtensionProperties"));
     vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties) (vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceLayerProperties"));
-    // Set an hook to vkCreateInstance
+    // Set an hook to real vkCreateInstance
     vkCreateInstance_HOOK = (PFN_vkCreateInstance) (vkGetInstanceProcAddr(nullptr, "vkCreateInstance"));
     // point public vkCreateInstance to our delegate function
     vkCreateInstance = &vkCreateInstanceDelegate;    
 }
 
 /**
- * This functions intercepts vkCreateInstance and loads all Vulkan functions.
+ * Delegate function to vkCreateInstance
+ * This functions intercepts vkCreateInstance calls and loads all Vulkan functions.
  */
 VkResult vkCreateInstanceDelegate( const VkInstanceCreateInfo* pCreateInfo,
                                    const VkAllocationCallbacks* pAllocator,
@@ -90,7 +91,7 @@ VkResult vkCreateInstanceDelegate( const VkInstanceCreateInfo* pCreateInfo,
     }	
     //Load VkInstance's related functions
     VkInstance instance = *pInstance;
-    LoadInstanceProcs(instance);	
+    LoadInstanceProcs(instance);    
     return res;
 }
 

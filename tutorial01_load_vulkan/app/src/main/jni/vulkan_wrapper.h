@@ -19,10 +19,19 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 
-/* Initialize the Vulkan function pointer variables declared in this header.
- * Returns 0 if vulkan is not available, non-zero if it is available.
+/** 
+ * Initialize Vulkan function pointer variables declared in this header.
+ * After call, following functions will be available:
+ *  vkEnumerateInstanceExtensionProperties
+ *  vkEnumerateInstanceLayerProperties
+ *  vkCreateInstance
+ *  
+ * Note: core functions will be available after vkCreateInstance() call.
+ *
+ * @returns 0 if vulkan is not available, non-zero otherwise.
  */
-int InitVulkan(void);
+extern int InitVulkan(void);
+
 
 // VK_core
 extern PFN_vkCreateInstance vkCreateInstance;
