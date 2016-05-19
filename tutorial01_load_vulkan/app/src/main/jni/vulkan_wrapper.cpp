@@ -21,13 +21,8 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 #include "vulkan_wrapper.h"
+#include <dlfcn.h>
 
-#ifdef _WIN32
-   #include <windows.h>
-   #include <wchar.h>
-#else
-   #include <dlfcn.h>
-#endif
 
 // a hook to Vulkan native function
 static PFN_vkCreateInstance vkCreateInstance_HOOK;
@@ -53,7 +48,7 @@ int LoadInstanceProcs(VkInstance instance);
 int InitVulkan(void) {
     #define LoadProcAddress dlsym
     void* libvulkan = nullptr;    
-    libvulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);	
+    libvulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);	  
     
     if (!libvulkan)
         return 0;
