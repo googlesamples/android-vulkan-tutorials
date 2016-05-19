@@ -51,15 +51,9 @@ int LoadInstanceProcs(VkInstance instance);
  * @return 0 if failed to init Vulkan
  */
 int InitVulkan(void) {
-#ifdef _WIN32
-    #define LoadProcAddress GetProcAddress
-    HINSTANCE  libvulkan = NULL;    
-    libvulkan = LoadLibrary("vulkan-1.dll");   
-#else  // all *nix
     #define LoadProcAddress dlsym
     void* libvulkan = nullptr;    
     libvulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);	
-#endif    
     
     if (!libvulkan)
         return 0;
