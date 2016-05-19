@@ -19,12 +19,6 @@
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 
-// enable all extensions
-#ifndef VULKAN_WRAPPER_ENABLE_ALL_EXTENSIONS_DEFAULT
- #define VULKAN_WRAPPER_ENABLE_ALL_EXTENSIONS_DEFAULT 1
-#endif
-
-
 /** 
  * Initialize Vulkan function pointer variables declared in this header.
  * After call, following functions will be available:
