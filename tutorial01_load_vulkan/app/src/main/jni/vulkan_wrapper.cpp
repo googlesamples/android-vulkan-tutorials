@@ -11,12 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 // This file is handmade.
-
-#include <string.h>
-#include <vector>
-#include <stdio.h>
 
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
@@ -64,7 +59,8 @@ int InitVulkan(void) {
     // Set an hook to real vkCreateInstance
     vkCreateInstance_HOOK = (PFN_vkCreateInstance) (vkGetInstanceProcAddr(nullptr, "vkCreateInstance"));
     // point public vkCreateInstance to our delegate function
-    vkCreateInstance = &vkCreateInstanceDelegate;    
+    vkCreateInstance = &vkCreateInstanceDelegate;   
+    return 1;
 }
 
 /**
