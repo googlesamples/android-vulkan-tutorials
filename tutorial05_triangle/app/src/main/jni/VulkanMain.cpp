@@ -626,8 +626,8 @@ bool InitVulkan(android_app* app) {
       .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
       .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
       .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-      .initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-      .finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+      .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
   };
 
   VkAttachmentReference colourReference = {
@@ -808,11 +808,14 @@ bool VulkanDrawFrame(void) {
                               UINT64_MAX, render.semaphore_,
                               VK_NULL_HANDLE, &nextIndex));
   CALL_VK(vkResetFences(device.device_, 1, &render.fence_));
+
+  VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   VkSubmitInfo submit_info = {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
         .pNext = nullptr,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &render.semaphore_,
+        .pWaitDstStageMask = &waitStageMask,
         .commandBufferCount = 1,
         .pCommandBuffers = &render.cmdBuffer_[nextIndex],
         .signalSemaphoreCount = 0,
