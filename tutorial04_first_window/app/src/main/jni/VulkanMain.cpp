@@ -72,7 +72,6 @@ struct VulkanRenderInfo {
   VkCommandBuffer* cmdBuffer_;
   uint32_t cmdBufferLen_;
   VkSemaphore semaphore_;
-  VkFence fence_;
 };
 VulkanRenderInfo render;
 
@@ -464,16 +463,6 @@ bool InitVulkan(android_app* app) {
     CALL_VK(vkEndCommandBuffer(render.cmdBuffer_[bufferIndex]));
   }
 
-  // We need to create a fence to be able, in the main loop, to wait for our
-  // draw command(s) to finish before swapping the framebuffers
-  VkFenceCreateInfo fenceCreateInfo{
-      .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = 0,
-  };
-  CALL_VK(
-      vkCreateFence(device.device_, &fenceCreateInfo, nullptr, &render.fence_));
-
   // We need to create a semaphore to be able to wait, in the main loop, for our
   // framebuffer to be available for us before drawing.
   VkSemaphoreCreateInfo semaphoreCreateInfo{
@@ -514,7 +503,7 @@ bool VulkanDrawFrame(void) {
   CALL_VK(vkAcquireNextImageKHR(device.device_, swapchain.swapchain_,
                                 UINT64_MAX, render.semaphore_, VK_NULL_HANDLE,
                                 &nextIndex));
-  CALL_VK(vkResetFences(device.device_, 1, &render.fence_));
+
   VkSubmitInfo submit_info = {.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
                               .pNext = nullptr,
                               .waitSemaphoreCount = 1,
@@ -523,9 +512,10 @@ bool VulkanDrawFrame(void) {
                               .pCommandBuffers = &render.cmdBuffer_[nextIndex],
                               .signalSemaphoreCount = 0,
                               .pSignalSemaphores = nullptr};
-  CALL_VK(vkQueueSubmit(device.queue_, 1, &submit_info, render.fence_));
-  CALL_VK(
-      vkWaitForFences(device.device_, 1, &render.fence_, VK_TRUE, 100000000));
+  CALL_VK(vkQueueSubmit(device.queue_, 1, &submit_info, VK_NULL_HANDLE));
+
+  // wait for our draw command(s) to finish before swapping the framebuffers
+  CALL_VK(vkQueueWaitIdle(device.queue_));
 
   LOGI("Drawing frames......");
 
