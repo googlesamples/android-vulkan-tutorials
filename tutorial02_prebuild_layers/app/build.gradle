@@ -1,37 +1,7 @@
 apply plugin: 'com.android.application'
 
-/**
- * Download validation layer binary release zip file from Khronos github repo
- *    https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases
- * Note that: binary release could be manually downloaded and put it into
- *            jniLibs directory. This is just to do it automatically in case
- *            someday want to use github action continuous CI.
- * The release file name we are interested is in the format of
- *    android-binaries-${VERSION}.zip
- * When you need to use the latest release, do these:
- * 1. remove the pre-downloaded dir(if exists): rm -fr $projectRoot.layerLibs
- * 2. update the version number for ${LAYER_VERSION} in the following line:
- */
-def LAYER_VERSION = "1.3.231.1"
-
-// Variables shared between download layer binary and project build script.
-def LAYER_SITE ="https://github.com/KhronosGroup/Vulkan-ValidationLayers"
-def LAYER_LIB_ROOT= rootDir.absolutePath.toString() + "/layerLib"
-def LAYER_JNILIB_DIR="${LAYER_LIB_ROOT}/jniLibs"
-
-// Download the release zip file to ${LAYER_LIB_ROOT}/
-task download {
-    mkdir "${LAYER_LIB_ROOT}"
-    def f = new File("${LAYER_LIB_ROOT}/android-binaries-${LAYER_VERSION}.zip")
-    new URL("${LAYER_SITE}/releases/download/sdk-${LAYER_VERSION}/android-binaries-${LAYER_VERSION}.zip")
-            .withInputStream { i -> f.withOutputStream { it << i } }
-}
-
-// Unzip the downloaded release file to ${LAYER_JNILIB_DIR}, it is place for APK packing.
-task unzip(dependsOn: download, type: Copy) {
-    from zipTree(file("${LAYER_LIB_ROOT}/android-binaries-${LAYER_VERSION}.zip"))
-    into file("${LAYER_JNILIB_DIR}")
-}
+// Download VVL if needed.
+apply from: 'download_vvl.gradle'
 
 // This project's build scripts follows
 android {
@@ -58,16 +28,6 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
-
-    sourceSets {
-        main {
-            jniLibs {
-              // Pre-requirement: layer release downloaded and unzip to this location
-              srcDirs = ["${LAYER_JNILIB_DIR}"]
-            }
-        }
-    }
-
     buildTypes {
         release {
              minifyEnabled = false
@@ -78,12 +38,6 @@ android {
 }
 
 dependencies {
-    def jniFile = "${LAYER_JNILIB_DIR}/arm64-v8a/libVkLayer_khronos_validation.so"
-    if(!file("${jniFile}").exists()) {
-        implementation files("${jniFile}") {
-            builtBy 'unzip'
-        }
-    }
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation "androidx.games:games-activity:1.1.0"
 }
