@@ -15,8 +15,7 @@
  limitations under the License.
 -->
 <!-- BEGIN_INCLUDE(manifest) -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.android.example.vulkan.tutorials.six">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application android:label="@string/app_name"
         android:theme="@style/Application.Fullscreen">

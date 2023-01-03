@@ -15,8 +15,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
-    ndkVersion '22.1.7171670'
+    compileSdkVersion 33
+    ndkVersion '25.1.8937393'
     defaultConfig {
         applicationId "com.android.example.vulkan.tutorials.six"
         minSdkVersion 26
@@ -33,15 +33,17 @@ android {
     }
     externalNativeBuild {
         cmake {
-            version '3.18.1'
+            version '3.22.1'
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
     buildTypes.release.minifyEnabled = false
     buildFeatures.prefab = true
+    namespace 'com.android.example.vulkan.tutorials.six'
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation "androidx.games:games-activity:1.1.0"
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation "androidx.games:games-activity:1.2.2"
 }
