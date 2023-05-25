@@ -446,7 +446,7 @@ VkResult LoadTextureFromFile(const char* filePath,
   vkGetImageMemoryRequirements(device.device_, tex_obj->image, &mem_reqs);
   mem_alloc.allocationSize = mem_reqs.size;
   VK_CHECK(AllocateMemoryTypeFromProperties(mem_reqs.memoryTypeBits,
-                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                             &mem_alloc.memoryTypeIndex));
   CALL_VK(vkAllocateMemory(device.device_, &mem_alloc, nullptr, &tex_obj->mem));
   CALL_VK(vkBindImageMemory(device.device_, tex_obj->image, tex_obj->mem, 0));
