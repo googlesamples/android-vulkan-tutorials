@@ -337,8 +337,8 @@ bool MapMemoryTypeToIndex(uint32_t typeBits, VkFlags requirements_mask,
   VkPhysicalDeviceMemoryProperties memoryProperties;
   vkGetPhysicalDeviceMemoryProperties(device.gpuDevice_, &memoryProperties);
   // Search memtypes to find first index with those properties
-  for (uint32_t i = 0; i < 32; i++) {
-    if ((typeBits & 1) == 1) {
+  for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
+    if ((typeBits & (1 << i)) == 1) {
       // Type is available, does it match user properties?
       if ((memoryProperties.memoryTypes[i].propertyFlags & requirements_mask) ==
           requirements_mask) {
